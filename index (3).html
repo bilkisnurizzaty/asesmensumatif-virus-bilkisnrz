@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Viro-Lab — Misi Pemburu Virus</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#141b3a;--bg2:#222e66;--ink:#f3efe6;--mut:#a9b3d9;--pink:#ff6b8a;--teal:#3fc6b7;--amb:#ffc857;--ok:#46d39a;--no:#ff5d73;--glass:rgba(255,255,255,.07);color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+body{font:500 17px/1.5 Nunito,"Segoe UI",system-ui,sans-serif;color:var(--ink);background:radial-gradient(circle at 50% -10%,var(--bg2),var(--bg) 62%) fixed;padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom)}
+h1,h2,h3,.big{font-family:"Baloo 2","Trebuchet MS",system-ui,sans-serif;margin:0;line-height:1.1}
+#app{max-width:860px;margin:0 auto;padding:14px 0 30px}
+.btn{font:700 1rem "Baloo 2","Trebuchet MS",sans-serif;border:0;border-radius:14px;padding:12px 20px;color:#10163a;background:var(--amb);cursor:pointer;box-shadow:0 4px 0 #b88a1e}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #b88a1e}.btn.alt{background:var(--teal);box-shadow:0 4px 0 #23857a}.btn.gh{background:var(--glass);color:var(--ink);box-shadow:none;border:1px solid #fff3}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.slide{background:var(--glass);border:1px solid #fff2;border-radius:26px;padding:22px;backdrop-filter:blur(4px)}
+.lens{width:min(62vw,250px);aspect-ratio:1;margin:6px auto 14px;border-radius:50%;border:10px solid #0b1030;box-shadow:0 0 0 4px var(--teal),inset 0 0 40px #000a,0 0 50px #3fc6b755;background:radial-gradient(circle,#3b4b94,#1a2250);display:grid;place-items:center;overflow:hidden}
+.lens svg{width:78%;animation:pulse 3s ease-in-out infinite}@keyframes pulse{50%{transform:scale(1.08) rotate(6deg)}}
+.hero{text-align:center}.hero h1{font-size:clamp(2.2rem,8vw,3.6rem);font-weight:800;color:var(--pink);text-shadow:0 3px 0 #7a1f38}
+.hero p{color:var(--mut);max-width:46ch;margin:8px auto 18px}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:10px 0}
+.top{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
+.chip{background:var(--glass);border:1px solid #fff2;border-radius:99px;padding:4px 14px;font-weight:700}
+.score{font:800 1.6rem "Baloo 2",sans-serif;color:var(--amb)}
+.dots{display:flex;gap:7px;flex-wrap:wrap;margin:6px 0 12px}.dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--mut);display:block}
+.dots i.cur{border-color:var(--amb);box-shadow:0 0 0 3px #ffc85744}.dots i.ok{background:var(--ok);border-color:var(--ok)}.dots i.no{background:var(--no);border-color:var(--no)}
+.tm{height:10px;border-radius:9px;background:#0006;overflow:hidden;margin-bottom:14px}.tm b{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--teal),var(--amb),var(--pink))}
+.q{font-size:1.22rem;font-weight:700;margin:6px 0 12px}.fig{background:#0b1030;border-radius:18px;padding:6px;margin:0 auto 12px;max-width:340px}.fig svg{width:100%;display:block}
+.opts{display:grid;gap:10px}@media(min-width:640px){.opts.two{grid-template-columns:1fr 1fr}}
+.opt{text-align:left;font:700 1rem Nunito,sans-serif;color:var(--ink);background:#0b103a;border:2px solid #fff3;border-radius:16px;padding:12px 14px;cursor:pointer;display:flex;gap:12px;align-items:center}
+.opt:hover:not(:disabled){border-color:var(--teal)}.opt span{flex:none;width:30px;height:30px;border-radius:50%;background:var(--teal);color:#10163a;display:grid;place-items:center;font-family:"Baloo 2",sans-serif}
+.opt.ok{background:#14553f;border-color:var(--ok)}.opt.no{background:#5a1d2c;border-color:var(--no);animation:shk .35s}@keyframes shk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fb{margin-top:14px;border-radius:16px;padding:12px 16px;background:#0b1030;border-left:6px solid var(--teal)}.fb.ok{border-color:var(--ok)}.fb.no{border-color:var(--no)}.fb b{font-family:"Baloo 2",sans-serif;font-size:1.15rem}
+.bar{display:flex;align-items:center;gap:10px;margin:8px 0}.bar em{width:120px;font-style:normal;font-weight:700;flex:none}.bar div{flex:1;height:22px;background:#0006;border-radius:99px;overflow:hidden}.bar div b{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--amb));border-radius:99px;transition:width 1s}.bar u{text-decoration:none;width:60px;text-align:right;font-weight:700}
+.stars{font-size:2.6rem;letter-spacing:6px;text-align:center}.cover{text-align:center;padding:30px 10px}.cover .big{font-size:2.2rem;color:var(--amb)}
+input[type=text]{font:inherit;padding:9px 12px;border-radius:12px;border:2px solid #fff3;background:#0b103a;color:var(--ink);width:170px}
+.seg button.on{background:var(--amb);color:#10163a}
+.hint{font-size:.9rem;color:var(--mut);margin:4px 0 0}
+@media print{@page{size:A4 landscape;margin:0}body *{visibility:hidden}#cv,#cv *{visibility:visible}#cv{position:fixed;left:0;top:0;width:100%!important;border-radius:0!important}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main id="app"></main>
+<script>
+/* ========== BANK SOAL (b:1 Kenali Virus, 2 Pilah Cepat, 3 Misi Tubuh | d: 1 mudah–3 sulit | g: gambar) ========== */
+const Q=[
+/* ---------- BABAK 1: KENALI VIRUS ---------- */
+{b:1,d:1,q:"Ciri yang membedakan virus dari makhluk hidup lain adalah…",o:["Memiliki sel dengan inti","Tidak berstruktur sel dan hanya bereplikasi di dalam sel inang","Memiliki ribosom sendiri","Melakukan fotosintesis"],a:1,e:"Virus bersifat aselular: tanpa sel, tanpa ribosom, dan hanya dapat bereplikasi di dalam sel inang (parasit obligat)."},
+{b:1,d:1,q:"Bagian virus yang tersusun dari protein dan melindungi materi genetik disebut…",o:["Kapsid","Nukleus","Dinding sel","Flagela"],a:0,e:"Kapsid adalah selubung protein yang tersusun dari kapsomer dan membungkus DNA/RNA."},
+{b:1,d:1,g:"v",q:"Pada gambar, bagian bertanda B adalah…",o:["Kapsid","Materi genetik (DNA atau RNA)","Duri (spike)","Ribosom"],a:1,e:"B menunjuk materi genetik di dalam kapsid. Virus hanya memiliki salah satu: DNA atau RNA."},
+{b:1,d:2,g:"f",q:"Virus pada gambar menyerang bakteri. Virus semacam ini disebut…",o:["Bakteriofag","Retrovirus","Viroid","Prion"],a:0,e:"Bakteriofag (fag) adalah virus yang inangnya bakteri, dengan kepala, ekor, dan serabut ekor."},
+{b:1,d:2,g:"f",q:"Bagian bertanda C (serabut ekor) berfungsi untuk…",o:["Menempel pada permukaan bakteri","Menyimpan energi","Membuat protein","Berfotosintesis"],a:0,e:"Serabut ekor menempel pada reseptor bakteri (tahap adsorpsi) sebelum DNA fag disuntikkan."},
+{b:1,d:2,q:"Dmitri Iwanowski (1892) membuktikan bahwa penyebab penyakit mosaik tembakau…",o:["Lebih kecil dari bakteri karena lolos dari penyaring bakteri","Berupa jamur","Berupa bakteri besar","Hanya hidup di tanah"],a:0,e:"Getah daun sakit yang telah disaring tetap menular, jadi penyebabnya lebih kecil dari bakteri: virus."},
+{b:1,d:2,g:"s",q:"Pada gambar, manakah yang berukuran virus?",o:["A","B","C"],a:0,e:"Virus berukuran sekitar 20–300 nm, jauh lebih kecil daripada bakteri (B) dan sel eukariotik (C)."},
+{b:1,d:3,q:"Antibiotik tidak efektif melawan virus karena…",o:["Virus tidak memiliki struktur dan metabolisme sel yang menjadi target antibiotik","Virus terlalu besar","Virus tahan panas","Antibiotik hanya untuk jamur"],a:0,e:"Antibiotik menyasar dinding sel/ribosom bakteri. Virus tidak punya keduanya dan memakai mesin sel inang."},
+{b:1,d:3,q:"Virus disebut berada di perbatasan benda hidup dan tak hidup karena…",o:["Di luar inang tak aktif (bisa dikristalkan), di dalam inang bereplikasi","Bergerak dengan flagela","Memiliki klorofil","Memiliki organel lengkap"],a:0,e:"Di luar sel inang virus inert, tetapi di dalam sel inang ia memperbanyak diri."},
+{b:1,d:1,q:"Virus berukuran sangat kecil, diukur dalam satuan…",o:["Nanometer (nm)","Milimeter (mm)","Sentimeter (cm)","Kilometer (km)"],a:0,e:"Ukuran virus sekitar 20–300 nm, sehingga tidak terlihat dengan mikroskop cahaya biasa."},
+{b:1,d:1,q:"Virus hanya dapat diamati dengan…",o:["Mikroskop elektron","Kaca pembesar","Mikroskop cahaya biasa","Mata telanjang"],a:0,e:"Ukurannya yang sangat kecil membuat virus baru terlihat dengan mikroskop elektron."},
+{b:1,d:2,q:"Virus disebut parasit obligat karena…",o:["Hanya dapat hidup dan bereplikasi di dalam sel inang","Dapat hidup bebas di tanah","Membuat makanan sendiri","Dapat dibiakkan pada agar nutrien biasa"],a:0,e:"Virus tidak punya enzim dan ribosom sendiri, sehingga bergantung penuh pada sel inang."},
+{b:1,d:2,q:"Selubung (envelope) pada virus tertentu, misalnya HIV dan influenza, berasal dari…",o:["Membran sel inang","Dinding sel bakteri","Klorofil","Sitoplasma virus"],a:0,e:"Saat keluar dari sel inang, virus membawa sebagian membran sel inang sebagai selubungnya."},
+{b:1,d:2,q:"Satuan-satuan protein penyusun kapsid disebut…",o:["Kapsomer","Nukleotida","Ribosom","Plasmid"],a:0,e:"Kapsid tersusun dari banyak kapsomer."},
+{b:1,d:3,q:"Wendell Stanley (1935) berhasil…",o:["Mengkristalkan virus mosaik tembakau","Menemukan antibiotik","Menemukan sel","Membuat vaksin cacar"],a:0,e:"Kristal TMV tetap infektif saat dikembalikan ke tumbuhan, menunjukkan virus berbeda dari sel."},
+/* gambar virus berselubung */
+{b:1,d:2,g:"e",q:"Pada gambar virus berselubung, bagian bertanda A (duri/spike) berfungsi untuk…",o:["Menempel pada reseptor sel inang","Menyimpan cadangan makanan","Membuat protein virus","Menghasilkan energi"],a:0,e:"Duri (glikoprotein) mengenali dan menempel pada reseptor di permukaan sel inang."},
+{b:1,d:2,g:"e",q:"Bagian bertanda B pada gambar (selubung/envelope) berasal dari…",o:["Membran sel inang","Dinding sel bakteri","Ribosom inang","Sitoplasma virus"],a:0,e:"Selubung virus diambil dari membran sel inang ketika virus keluar dari sel."},
+{b:1,d:1,g:"e",q:"Bagian bertanda D pada gambar adalah…",o:["Materi genetik","Kapsid","Selubung","Duri"],a:0,e:"D menunjuk materi genetik (DNA atau RNA) yang berada di dalam kapsid."},
+{b:1,d:2,g:"e",q:"Bagian bertanda C pada gambar tersusun dari…",o:["Protein (kapsomer)","Lemak saja","Selulosa","Peptidoglikan"],a:0,e:"C adalah kapsid, yaitu selubung protein yang tersusun dari kapsomer."},
+/* gambar TMV */
+{b:1,d:1,g:"t",q:"Bentuk virus pada gambar adalah…",o:["Batang (heliks)","Polihedral (ikosahedral)","Kompleks (kepala dan ekor)","Bulat berselubung"],a:0,e:"Virus mosaik tembakau (TMV) berbentuk batang dengan kapsid tersusun melingkar seperti heliks."},
+{b:1,d:1,g:"t",q:"Bagian bertanda A pada gambar (selubung protein berpola spiral) disebut…",o:["Kapsid","Nukleus","Plasmid","Flagela"],a:0,e:"Selubung protein virus adalah kapsid."},
+{b:1,d:2,g:"t",q:"Virus berbentuk batang pada gambar (TMV) memiliki materi genetik berupa…",o:["RNA","DNA untai ganda","Protein saja","Lemak"],a:0,e:"TMV adalah virus RNA yang menyerang tumbuhan tembakau."},
+/* gambar polihedral */
+{b:1,d:1,g:"p",q:"Bentuk virus pada gambar adalah…",o:["Polihedral (ikosahedral)","Batang (heliks)","Kompleks (kepala dan ekor)","Spiral berflagela"],a:0,e:"Adenovirus berbentuk polihedral/ikosahedral dengan kapsid bersegi banyak."},
+/* gambar 4 bentuk */
+{b:1,d:1,g:"sh",q:"Pada gambar, manakah bentuk bakteriofag (kepala dan ekor)?",o:["A","B","C","D"],a:2,e:"C memiliki kepala, ekor, dan serabut ekor: ciri bakteriofag."},
+{b:1,d:1,g:"sh",q:"Pada gambar, manakah virus berbentuk batang seperti virus mosaik tembakau?",o:["A","B","C","D"],a:0,e:"A berbentuk batang (heliks), seperti TMV."},
+{b:1,d:2,g:"sh",q:"Pada gambar, manakah virus polihedral seperti adenovirus?",o:["A","B","C","D"],a:1,e:"B berbentuk segi banyak (polihedral/ikosahedral)."},
+{b:1,d:2,g:"sh",q:"Pada gambar, manakah virus bulat berselubung dan berduri seperti influenza atau HIV?",o:["A","B","C","D"],a:3,e:"D bulat dengan duri pada permukaan selubung."},
+/* gambar perbandingan ukuran */
+{b:1,d:2,g:"s",q:"Urutan ukuran dari yang terkecil ke terbesar pada gambar adalah…",o:["A → B → C","C → B → A","B → A → C","A → C → B"],a:0,e:"Virus (A) lebih kecil dari bakteri (B), dan bakteri lebih kecil dari sel eukariotik (C)."},
+{b:1,d:2,g:"s",q:"Pada gambar, B menunjukkan…",o:["Bakteri (prokariot)","Virus","Sel eukariotik","Sel tumbuhan"],a:0,e:"B berbentuk batang kecil tanpa inti: bakteri, yang lebih besar dari virus tetapi lebih kecil dari sel eukariotik."},
+/* gambar bakteriofag */
+{b:1,d:1,g:"f",q:"Bagian bertanda A (kepala) bakteriofag berisi…",o:["DNA fag","Ribosom","Mitokondria","Klorofil"],a:0,e:"Kepala fag dibungkus kapsid dan menyimpan materi genetik (DNA)."},
+{b:1,d:2,g:"f",q:"Bagian bertanda B (ekor) berfungsi untuk…",o:["Menyuntikkan materi genetik ke dalam sel bakteri","Membuat ATP","Berfotosintesis","Menyimpan lemak"],a:0,e:"Ekor fag adalah saluran untuk memasukkan DNA fag ke dalam sel bakteri."},
+/* teks */
+{b:1,d:1,q:"Materi genetik virus berupa…",o:["DNA saja atau RNA saja","DNA dan RNA sekaligus","Protein saja","Lemak saja"],a:0,e:"Virus hanya memiliki salah satu asam nukleat, yaitu DNA atau RNA."},
+{b:1,d:1,q:"Bentuk tubuh bakteriofag adalah…",o:["Kompleks: kepala, ekor, dan serabut ekor","Batang (heliks)","Bulat tanpa kapsid","Spiral berflagela"],a:0,e:"Bakteriofag memiliki kepala polihedral, ekor, dan serabut ekor."},
+{b:1,d:2,q:"Virus tidak dimasukkan ke dalam sistem klasifikasi lima kingdom karena…",o:["Tidak berstruktur sel (aselular)","Terlalu besar","Tidak pernah menyebabkan penyakit","Tidak dapat bermutasi"],a:0,e:"Sistem lima kingdom mengelompokkan makhluk hidup berbasis sel, sedangkan virus aselular."},
+{b:1,d:2,q:"Louis Pasteur berhasil membuat vaksin untuk penyakit…",o:["Rabies","Cacar air","Kolera","Malaria"],a:0,e:"Pasteur mengembangkan vaksin rabies (1885) dari jaringan saraf hewan terinfeksi yang dilemahkan."},
+{b:1,d:3,q:"Martinus Beijerinck (1898) menyebut penyebab penyakit mosaik tembakau sebagai…",o:["Contagium vivum fluidum (cairan hidup yang menular)","Sel bakteri","Jamur parasit","Alga"],a:0,e:"Beijerinck menyimpulkan penyebabnya bukan bakteri, melainkan agen penular berukuran sangat kecil dalam cairan."},
+{b:1,d:2,q:"Iwanowski menyaring getah daun tembakau sakit dengan saringan yang dapat menahan bakteri. Hasilnya…",o:["Filtrat tetap menularkan penyakit","Filtrat tidak lagi menular","Filtrat berubah warna","Filtrat berubah menjadi bakteri"],a:0,e:"Penyebab penyakit lolos dari saringan, sehingga ukurannya lebih kecil dari bakteri."},
+{b:1,d:2,q:"Virus dapat dikristalkan di luar sel inang. Hal ini menunjukkan bahwa di luar inang virus bersifat…",o:["Seperti benda mati","Seperti hewan","Seperti tumbuhan","Seperti jamur"],a:0,e:"Di luar inang virus tidak beraktivitas dan dapat berbentuk kristal."},
+{b:1,d:2,q:"Sifat virus yang menyerupai makhluk hidup adalah…",o:["Mampu bereplikasi dan bermutasi di dalam sel inang","Berfotosintesis","Memiliki klorofil","Bernapas dengan mitokondria"],a:0,e:"Di dalam inang virus memperbanyak diri dan materi genetiknya dapat bermutasi."},
+{b:1,d:1,q:"Contoh virus yang menyerang tumbuhan adalah…",o:["Virus mosaik tembakau (TMV)","HIV","Virus rabies","Bakteriofag"],a:0,e:"TMV menginfeksi tumbuhan tembakau dan tanaman sefamili."},
+{b:1,d:2,q:"Komponen yang dimiliki oleh semua virus adalah…",o:["Kapsid dan materi genetik","Selubung dan duri","Ribosom dan nukleus","Membran dan sitoplasma"],a:0,e:"Selubung dan duri hanya dimiliki sebagian virus, sedangkan kapsid dan materi genetik dimiliki semuanya."},
+{b:1,d:3,q:"Kelompok virus berikut yang semuanya memiliki selubung (envelope) adalah…",o:["HIV, virus influenza, dan virus corona","TMV, adenovirus, dan bakteriofag T4","Bakteriofag T4, TMV, dan HIV","Adenovirus, influenza, dan TMV"],a:0,e:"HIV, influenza, dan corona berselubung. TMV, adenovirus, dan fag T4 tidak berselubung (virus telanjang)."},
+{b:1,d:3,q:"Virus berselubung seperti virus corona mudah dinonaktifkan oleh sabun dan alkohol karena…",o:["Selubungnya mengandung lemak yang mudah rusak","Kapsidnya larut dalam air","Virus takut air","Materi genetiknya hilang saat basah"],a:0,e:"Sabun dan alkohol merusak lapisan lemak selubung sehingga virus kehilangan kemampuan infeksinya."},
+{b:1,d:1,q:"Ukuran virus dibandingkan bakteri umumnya…",o:["Jauh lebih kecil","Sama besar","Lebih besar","Lebih besar dari sel hewan"],a:0,e:"Virus sekitar 20–300 nm, sedangkan bakteri sekitar 1.000–5.000 nm."},
+{b:1,d:2,q:"Virus tidak memiliki metabolisme sendiri sehingga bergantung pada…",o:["Enzim dan ribosom sel inang","Cahaya matahari","Oksigen bebas","Klorofil"],a:0,e:"Virus memakai bahan, energi, dan mesin sintesis protein sel inang."},
+{b:1,d:2,q:"Virus hanya menyerang sel tertentu karena…",o:["Protein permukaan virus cocok dengan reseptor pada sel inang","Virus memilih sel berdasarkan warna","Sel inang memiliki klorofil","Sel inang memiliki dua inti"],a:0,e:"Kecocokan protein virus dan reseptor sel menentukan kekhususan inang."},
+{b:1,d:3,q:"Retrovirus berbeda dari virus RNA lain karena memiliki…",o:["Enzim reverse transkriptase untuk mengubah RNA menjadi DNA","Klorofil","Dinding sel","Flagela"],a:0,e:"Reverse transkriptase membuat DNA dari cetakan RNA, lalu DNA itu menyatu dengan DNA inang."},
+{b:1,d:1,q:"Ilmu yang mempelajari virus disebut…",o:["Virologi","Mikologi","Bakteriologi","Protozoologi"],a:0,e:"Virologi adalah cabang biologi yang mempelajari virus."},
+{b:1,d:2,q:"Satu nanometer (1 nm) sama dengan…",o:["10⁻⁹ meter","10⁻³ meter","10⁻⁶ meter","10⁻¹² meter"],a:0,e:"1 nm = 0,000000001 m = 10⁻⁹ m."},
+/* ---------- BABAK 2: PILAH CEPAT ---------- */
+{b:2,d:1,q:"Virus HIV termasuk…",o:["Virus DNA","Virus RNA"],a:1,e:"HIV adalah retrovirus berbahan genetik RNA dan memakai enzim reverse transkriptase."},
+{b:2,d:1,q:"Virus penyebab influenza termasuk…",o:["Virus DNA","Virus RNA"],a:1,e:"Virus influenza memiliki materi genetik RNA yang mudah bermutasi."},
+{b:2,d:2,q:"Virus Hepatitis B termasuk…",o:["Virus DNA","Virus RNA"],a:0,e:"Virus Hepatitis B memiliki materi genetik DNA untai ganda parsial."},
+{b:2,d:1,q:"Virus mosaik tembakau (TMV) menyerang…",o:["Tumbuhan","Manusia atau hewan"],a:0,e:"TMV menginfeksi tumbuhan, menimbulkan bercak mosaik pada daun."},
+{b:2,d:1,q:"Bakteriofag menyerang…",o:["Bakteri","Sel manusia"],a:0,e:"Inang bakteriofag adalah bakteri."},
+{b:2,d:2,q:"Virus menyisipkan DNA-nya ke genom inang dan menjadi profag, tidak langsung memecah sel. Ini siklus…",o:["Litik","Lisogenik"],a:1,e:"Pada siklus lisogenik, DNA virus (profag) menyatu dengan kromosom inang dan ikut diwariskan saat sel membelah."},
+{b:2,d:2,q:"Virus memperbanyak diri lalu sel inang pecah (lisis) dan virus baru keluar. Ini siklus…",o:["Litik","Lisogenik"],a:0,e:"Siklus litik berakhir dengan lisis sel inang."},
+{b:2,d:2,q:"Demam berdarah dengue ditularkan nyamuk Aedes. Penyebabnya adalah…",o:["Virus","Bakteri"],a:0,e:"DBD disebabkan virus dengue; nyamuk Aedes aegypti hanya vektor."},
+{b:2,d:3,q:"Tuberkulosis (TBC) disebabkan oleh…",o:["Virus","Bakteri"],a:1,e:"TBC disebabkan bakteri Mycobacterium tuberculosis, sehingga diobati dengan antibiotik."},
+{b:2,d:1,q:"Virus corona (SARS-CoV-2) termasuk…",o:["Virus DNA","Virus RNA"],a:1,e:"Coronavirus memiliki materi genetik RNA untai tunggal."},
+{b:2,d:2,q:"Virus penyebab cacar air (varisela) dan herpes termasuk…",o:["Virus DNA","Virus RNA"],a:0,e:"Keluarga virus herpes memiliki materi genetik DNA."},
+{b:2,d:1,q:"Virus rabies menyerang…",o:["Tumbuhan","Manusia atau hewan"],a:1,e:"Rabies ditularkan lewat gigitan hewan terinfeksi dan menyerang sistem saraf."},
+{b:2,d:1,q:"Flu burung (avian influenza) disebabkan oleh…",o:["Virus","Bakteri"],a:0,e:"Flu burung disebabkan virus influenza tipe A."},
+{b:2,d:2,q:"Demam tifoid (tipus) disebabkan oleh…",o:["Virus","Bakteri"],a:1,e:"Tifoid disebabkan bakteri Salmonella typhi."},
+{b:2,d:2,q:"Virus yang membawa enzim reverse transkriptase, seperti HIV, termasuk golongan…",o:["Retrovirus","Bakteriofag"],a:0,e:"Retrovirus mengubah RNA menjadi DNA dengan enzim reverse transkriptase."},
+/* litik vs lisogenik (teks) */
+{b:2,d:1,q:"Pada siklus ini terbentuk profag.",o:["Litik","Lisogenik"],a:1,e:"Profag adalah DNA virus yang menyatu dengan kromosom inang pada siklus lisogenik."},
+{b:2,d:1,q:"Pada akhir siklus ini sel inang mengalami lisis.",o:["Litik","Lisogenik"],a:0,e:"Lisis (pecahnya sel inang) merupakan tahap akhir siklus litik."},
+{b:2,d:2,q:"Virus tidak langsung membunuh sel inang; DNA virus ikut diperbanyak setiap sel inang membelah.",o:["Litik","Lisogenik"],a:1,e:"Pada siklus lisogenik, profag ikut direplikasi bersama kromosom inang."},
+{b:2,d:2,q:"Segera setelah penetrasi terjadi tahap sintesis dan perakitan virus baru.",o:["Litik","Lisogenik"],a:0,e:"Pada siklus litik, setelah penetrasi virus langsung mengambil alih sel untuk membuat virus baru."},
+{b:2,d:3,q:"Sinar UV atau zat kimia dapat memicu DNA virus keluar dari kromosom inang (induksi). Fase sebelum induksi ini adalah siklus…",o:["Litik","Lisogenik"],a:1,e:"Profag yang dorman pada siklus lisogenik dapat diaktifkan oleh pemicu sehingga masuk ke siklus litik."},
+{b:2,d:2,q:"Virus virulen (ganas) menjalani siklus…",o:["Litik","Lisogenik"],a:0,e:"Virus virulen selalu menjalani siklus litik dan segera menghancurkan sel inang."},
+{b:2,d:3,q:"Virus temperat (sedang) dapat menjalani…",o:["Hanya siklus litik","Siklus litik maupun lisogenik"],a:1,e:"Virus temperat dapat memilih siklus lisogenik, lalu beralih ke litik bila ada pemicu."},
+{b:2,d:2,q:"Sel bakteri tetap hidup dan membelah normal walaupun mengandung DNA virus. Ini terjadi pada siklus…",o:["Litik","Lisogenik"],a:1,e:"Selama berupa profag, DNA virus tidak merusak sel dan diwariskan ke sel anak."},
+{b:2,d:2,q:"Jumlah virus baru melonjak dalam waktu singkat, lalu sel inang pecah. Ini siklus…",o:["Litik","Lisogenik"],a:0,e:"Siklus litik menghasilkan banyak virus baru dengan cepat."},
+{b:2,d:3,q:"Infeksi laten HIV (materi genetik virus tersisip di DNA sel inang) mirip dengan siklus…",o:["Litik","Lisogenik"],a:1,e:"Provirus HIV menyatu dengan DNA sel inang dan dapat dorman, mirip profag pada siklus lisogenik."},
+/* litik vs lisogenik (gambar) */
+{b:2,d:1,g:"lit5",q:"Gambar menunjukkan sel bakteri pecah dan fag-fag baru keluar. Hal ini terjadi pada siklus…",o:["Litik","Lisogenik"],a:0,e:"Pecahnya sel inang (lisis) adalah akhir siklus litik."},
+{b:2,d:1,g:"pro",q:"Gambar menunjukkan DNA fag menyatu dengan kromosom bakteri (profag). Ini ciri siklus…",o:["Litik","Lisogenik"],a:1,e:"Penyatuan DNA virus dengan kromosom inang adalah ciri siklus lisogenik."},
+{b:2,d:2,g:"prodiv",q:"Kedua sel anak pada gambar sama-sama membawa profag. Hal ini terjadi pada siklus…",o:["Litik","Lisogenik"],a:1,e:"Profag ikut tereplikasi dan diwariskan ke sel anak pada siklus lisogenik."},
+{b:2,d:2,g:"cyc",q:"Pada gambar, jalur A menggambarkan siklus…",o:["Litik","Lisogenik"],a:1,e:"Jalur A: DNA fag menyatu dengan kromosom bakteri dan diwariskan saat sel membelah, yaitu siklus lisogenik."},
+{b:2,d:2,g:"cyc",q:"Pada gambar, jalur B menggambarkan siklus…",o:["Litik","Lisogenik"],a:0,e:"Jalur B: fag langsung disintesis dan dirakit, lalu sel pecah, yaitu siklus litik."},
+/* DNA / RNA */
+{b:2,d:2,q:"Virus campak termasuk…",o:["Virus DNA","Virus RNA"],a:1,e:"Virus campak memiliki materi genetik RNA."},
+{b:2,d:3,q:"Virus polio termasuk…",o:["Virus DNA","Virus RNA"],a:1,e:"Poliovirus memiliki materi genetik RNA untai tunggal."},
+{b:2,d:3,q:"Virus Hepatitis A termasuk…",o:["Virus DNA","Virus RNA"],a:1,e:"Virus Hepatitis A adalah virus RNA, berbeda dengan Hepatitis B yang DNA."},
+{b:2,d:3,q:"Virus cacar (variola) termasuk…",o:["Virus DNA","Virus RNA"],a:0,e:"Virus variola (cacar) memiliki materi genetik DNA untai ganda."},
+{b:2,d:3,q:"Virus dengue penyebab DBD termasuk…",o:["Virus DNA","Virus RNA"],a:1,e:"Virus dengue memiliki materi genetik RNA."},
+{b:2,d:3,q:"Human papillomavirus (HPV) termasuk…",o:["Virus DNA","Virus RNA"],a:0,e:"HPV memiliki materi genetik DNA."},
+{b:2,d:3,q:"Virus Ebola termasuk…",o:["Virus DNA","Virus RNA"],a:1,e:"Virus Ebola memiliki materi genetik RNA."},
+/* virus atau bakteri */
+{b:2,d:1,q:"Polio disebabkan oleh…",o:["Virus","Bakteri"],a:0,e:"Polio disebabkan poliovirus yang menyerang saraf dan dapat menyebabkan kelumpuhan."},
+{b:2,d:2,q:"Tetanus disebabkan oleh…",o:["Virus","Bakteri"],a:1,e:"Tetanus disebabkan bakteri Clostridium tetani."},
+{b:2,d:2,q:"Gondongan (mumps) disebabkan oleh…",o:["Virus","Bakteri"],a:0,e:"Gondongan disebabkan virus mumps yang menyerang kelenjar ludah."},
+{b:2,d:2,q:"Kusta (lepra) disebabkan oleh…",o:["Virus","Bakteri"],a:1,e:"Kusta disebabkan bakteri Mycobacterium leprae."},
+{b:2,d:2,q:"Difteri disebabkan oleh…",o:["Virus","Bakteri"],a:1,e:"Difteri disebabkan bakteri Corynebacterium diphtheriae."},
+{b:2,d:3,q:"Chikungunya disebabkan oleh…",o:["Virus","Bakteri"],a:0,e:"Chikungunya disebabkan virus yang ditularkan nyamuk Aedes."},
+{b:2,d:3,q:"Sifilis disebabkan oleh…",o:["Virus","Bakteri"],a:1,e:"Sifilis disebabkan bakteri Treponema pallidum."},
+{b:2,d:1,q:"COVID-19 disebabkan oleh…",o:["Virus","Bakteri"],a:0,e:"COVID-19 disebabkan virus SARS-CoV-2."},
+{b:2,d:3,q:"Batuk rejan (pertusis) disebabkan oleh…",o:["Virus","Bakteri"],a:1,e:"Pertusis disebabkan bakteri Bordetella pertussis."},
+{b:2,d:1,q:"Penyakit yang dapat diobati dengan antibiotik disebabkan oleh…",o:["Virus","Bakteri"],a:1,e:"Antibiotik bekerja pada bakteri, bukan virus."},
+/* inang */
+{b:2,d:2,q:"Virus penyebab penyakit tungro menyerang…",o:["Tumbuhan (padi)","Hewan"],a:0,e:"Tungro adalah penyakit virus pada tanaman padi."},
+{b:2,d:2,q:"Virus penyebab penyakit tetelo (Newcastle disease) menyerang…",o:["Tumbuhan","Hewan (unggas)"],a:1,e:"Newcastle disease menyerang ayam dan unggas lain."},
+/* berselubung atau tidak */
+{b:2,d:2,q:"Virus influenza…",o:["Berselubung","Tanpa selubung"],a:0,e:"Virus influenza memiliki selubung dengan duri hemaglutinin dan neuraminidase."},
+{b:2,d:2,q:"Virus mosaik tembakau (TMV)…",o:["Berselubung","Tanpa selubung"],a:1,e:"TMV adalah virus telanjang: kapsid tanpa selubung."},
+{b:2,d:2,q:"Bakteriofag T4…",o:["Berselubung","Tanpa selubung"],a:1,e:"Bakteriofag T4 tidak memiliki selubung."},
+{b:2,d:2,q:"HIV…",o:["Berselubung","Tanpa selubung"],a:0,e:"HIV memiliki selubung yang berasal dari membran sel inang."},
+/* benar / salah */
+{b:2,d:1,q:"Antibiotik dapat membunuh virus.",o:["Benar","Salah"],a:1,e:"Antibiotik hanya efektif terhadap bakteri."},
+{b:2,d:1,q:"Vaksin berisi antigen yang telah dilemahkan atau dimatikan.",o:["Benar","Salah"],a:0,e:"Antigen pada vaksin merangsang pembentukan antibodi tanpa menimbulkan penyakit berat."},
+{b:2,d:1,q:"Virus memiliki ribosom sendiri untuk membuat protein.",o:["Benar","Salah"],a:1,e:"Virus memakai ribosom sel inang."},
+{b:2,d:1,q:"HIV dapat menular melalui gigitan nyamuk.",o:["Benar","Salah"],a:1,e:"HIV tidak menular lewat gigitan nyamuk."},
+{b:2,d:1,q:"Materi genetik virus dapat bermutasi.",o:["Benar","Salah"],a:0,e:"Mutasi, terutama pada virus RNA, menghasilkan varian baru."},
+{b:2,d:1,q:"Virus tergolong sel prokariotik.",o:["Benar","Salah"],a:1,e:"Virus aselular, bukan sel prokariotik maupun eukariotik."},
+{b:2,d:1,q:"Mencuci tangan pakai sabun membantu mencegah penularan virus.",o:["Benar","Salah"],a:0,e:"Sabun merusak selubung dan melepaskan virus dari kulit."},
+{b:2,d:2,q:"Profag dapat diwariskan ke sel anak ketika bakteri membelah.",o:["Benar","Salah"],a:0,e:"DNA profag menyatu dengan kromosom bakteri sehingga ikut direplikasi."},
+{b:2,d:3,q:"Siklus litik selalu didahului oleh siklus lisogenik.",o:["Benar","Salah"],a:1,e:"Siklus litik dapat terjadi langsung setelah infeksi. Hanya virus temperat yang dapat beralih dari lisogenik ke litik."},
+{b:2,d:2,q:"Semua virus bersifat merugikan manusia.",o:["Benar","Salah"],a:1,e:"Ada virus yang dimanfaatkan sebagai biopestisida, vektor terapi gen, dan terapi fag."},
+{b:2,d:2,q:"Semua virus memiliki selubung (envelope).",o:["Benar","Salah"],a:1,e:"Banyak virus tidak berselubung, misalnya TMV, adenovirus, dan bakteriofag T4."},
+{b:2,d:1,q:"Virus dapat bereplikasi di luar sel inang.",o:["Benar","Salah"],a:1,e:"Virus hanya dapat bereplikasi di dalam sel inang."},
+/* ---------- BABAK 3: MISI TUBUH ---------- */
+{b:3,d:1,q:"Tahap pertama dalam siklus litik adalah…",o:["Adsorpsi (penempelan)","Lisis","Perakitan","Sintesis"],a:0,e:"Urutannya: adsorpsi, penetrasi, sintesis, perakitan, lisis."},
+{b:3,d:2,q:"Urutan siklus litik yang benar adalah…",o:["Adsorpsi → penetrasi → sintesis → perakitan → lisis","Lisis → adsorpsi → sintesis → perakitan → penetrasi","Penetrasi → lisis → adsorpsi → sintesis → perakitan","Adsorpsi → lisis → sintesis → penetrasi → perakitan"],a:0,e:"Virus menempel, memasukkan materi genetik, membuat komponen, merakit, lalu memecah sel inang."},
+{b:3,d:2,q:"HIV melemahkan daya tahan tubuh karena menyerang…",o:["Limfosit T helper (CD4)","Sel darah merah","Sel otot","Sel saraf"],a:0,e:"Berkurangnya limfosit T helper membuat tubuh mudah terkena infeksi oportunistik (AIDS)."},
+{b:3,d:2,q:"Vaksin mencegah penyakit virus karena…",o:["Merangsang tubuh membentuk antibodi dan sel memori","Membunuh virus langsung seperti antibiotik","Menambah sel darah merah","Menghentikan replikasi dengan klorofil"],a:0,e:"Vaksin berisi antigen yang dilemahkan atau dimatikan sehingga sistem imun siap menghadapi infeksi asli."},
+{b:3,d:1,q:"Contoh pencegahan penyakit virus yang tepat adalah…",o:["Vaksinasi dan mencuci tangan","Minum antibiotik setiap hari","Menghindari sinar matahari","Makan sayur mentah saja"],a:0,e:"Vaksinasi dan kebersihan menekan penularan; antibiotik tidak bekerja pada virus."},
+{b:3,d:3,q:"Salah satu manfaat virus bagi manusia adalah…",o:["Pengendali hama (biopestisida) dan pembawa gen dalam terapi gen","Penghasil klorofil","Penghasil antibiotik","Penyubur tanah"],a:0,e:"Virus dimanfaatkan sebagai biopestisida dan vektor rekayasa genetika."},
+{b:3,d:3,q:"Vaksin influenza perlu diperbarui hampir tiap tahun karena…",o:["Materi genetik RNA mudah bermutasi sehingga antigennya berubah","Virus berubah menjadi bakteri","Vaksin lama rusak terkena matahari","Virus pindah ke tumbuhan"],a:0,e:"Mutasi pada RNA membuat protein permukaan virus berubah sehingga antibodi lama kurang cocok."},
+{b:3,d:3,q:"Seseorang terinfeksi virus tetapi gejala baru muncul lama kemudian. Hal ini dapat terjadi karena virus berada dalam fase…",o:["Lisogenik: profag menyatu dengan DNA inang dan belum aktif","Mati di dalam sel","Hanya berupa kapsid tanpa materi genetik","Berubah menjadi sel inang"],a:0,e:"Profag dapat dorman lama, lalu aktif (masuk siklus litik) saat ada pemicu."},
+{b:3,d:1,q:"Penyakit berikut disebabkan virus, kecuali…",o:["Campak","Polio","Kolera","Rabies"],a:2,e:"Kolera disebabkan bakteri Vibrio cholerae; campak, polio, dan rabies disebabkan virus."},
+{b:3,d:1,q:"Vaksin MR digunakan untuk mencegah…",o:["Campak dan rubella","TBC dan kusta","Kolera dan tifus","Malaria dan DBD"],a:0,e:"MR = Measles (campak) dan Rubella, keduanya disebabkan virus."},
+{b:3,d:1,q:"HIV dapat menular melalui…",o:["Kontak cairan tubuh, misalnya darah dan hubungan seksual berisiko","Berjabat tangan","Duduk bersebelahan","Gigitan nyamuk"],a:0,e:"HIV tidak menular lewat sentuhan biasa atau gigitan nyamuk."},
+{b:3,d:2,q:"Pada tahap sintesis siklus litik terjadi…",o:["Pembuatan komponen virus baru memakai bahan dan enzim sel inang","Penempelan virus pada sel","Pecahnya sel inang","Perubahan virus menjadi bakteri"],a:0,e:"Materi genetik virus mengambil alih mesin sel inang untuk membuat DNA/RNA dan protein virus."},
+{b:3,d:3,q:"Antibodi dihasilkan oleh…",o:["Limfosit B (sel plasma)","Eritrosit","Trombosit","Sel otot"],a:0,e:"Limfosit B berdiferensiasi menjadi sel plasma yang menghasilkan antibodi."},
+{b:3,d:3,q:"Penderita HIV dibantu dengan obat…",o:["Antiretroviral (ARV)","Antibiotik","Antijamur","Vitamin saja"],a:0,e:"ARV menekan replikasi HIV, tetapi belum menyembuhkan sepenuhnya."},
+{b:3,d:1,q:"Pencegahan DBD yang tepat adalah…",o:["3M Plus: menguras, menutup, dan mendaur ulang barang bekas","Minum antibiotik","Memakai masker saja","Menghindari makanan pedas"],a:0,e:"Memutus tempat berkembang biak nyamuk Aedes adalah kunci pencegahan DBD."},
+/* gambar tahapan siklus litik */
+{b:3,d:1,g:"lit1",q:"Tahap siklus litik yang ditunjukkan gambar adalah…",o:["Adsorpsi","Penetrasi","Sintesis","Lisis"],a:0,e:"Fag menempelkan serabut ekornya pada permukaan bakteri: adsorpsi."},
+{b:3,d:2,g:"lit1",q:"Pada tahap yang ditunjukkan gambar, fag menempel pada…",o:["Reseptor di permukaan sel bakteri","Inti sel bakteri","Ribosom bakteri","Plasmid bakteri"],a:0,e:"Serabut ekor mengenali reseptor spesifik pada permukaan bakteri."},
+{b:3,d:2,g:"lit2",q:"Tahap siklus litik yang ditunjukkan gambar adalah…",o:["Adsorpsi","Penetrasi","Sintesis","Perakitan"],a:1,e:"DNA fag disuntikkan ke dalam sel bakteri, sedangkan kapsid kosong tertinggal di luar: penetrasi."},
+{b:3,d:2,g:"lit2",q:"Setelah tahap pada gambar, bagian fag yang tertinggal di luar sel adalah…",o:["Kapsid kosong","DNA fag","Ribosom","Kromosom bakteri"],a:0,e:"Hanya DNA fag yang masuk. Kapsid kosong tertinggal di luar."},
+{b:3,d:2,g:"lit3",q:"Tahap siklus litik yang ditunjukkan gambar adalah…",o:["Adsorpsi","Penetrasi","Sintesis","Lisis"],a:2,e:"DNA dan komponen fag dibuat dalam jumlah banyak, sedangkan DNA bakteri dirusak: sintesis."},
+{b:3,d:2,g:"lit3",q:"Pada tahap yang ditunjukkan gambar, komponen fag baru dibuat dengan memakai…",o:["Enzim, ribosom, dan bahan dari sel bakteri","Cahaya matahari","Antibiotik","Klorofil"],a:0,e:"Fag tidak punya mesin sintesis sendiri, jadi memakai perangkat sel inang."},
+{b:3,d:2,g:"lit4",q:"Tahap siklus litik yang ditunjukkan gambar adalah…",o:["Penetrasi","Sintesis","Perakitan","Lisis"],a:2,e:"DNA fag dan komponen protein dirangkai menjadi fag utuh: perakitan."},
+{b:3,d:2,g:"lit4",q:"Hasil tahap yang ditunjukkan gambar adalah…",o:["Fag-fag baru yang utuh di dalam sel","Sel bakteri baru","Antibodi","Kristal garam"],a:0,e:"Pada perakitan terbentuk banyak partikel fag utuh di dalam sel bakteri."},
+{b:3,d:1,g:"lit5",q:"Tahap siklus litik yang ditunjukkan gambar adalah…",o:["Adsorpsi","Sintesis","Perakitan","Lisis"],a:3,e:"Sel bakteri pecah dan fag baru keluar: lisis."},
+{b:3,d:3,g:"lit5",q:"Agar sel bakteri pecah pada tahap lisis, fag menghasilkan enzim…",o:["Lisozim","Amilase","Pepsin","Lipase"],a:0,e:"Enzim lisozim buatan fag melarutkan dinding sel bakteri sehingga sel pecah."},
+/* gambar siklus lisogenik */
+{b:3,d:1,g:"pro",q:"Bagian bertanda A pada gambar disebut…",o:["Profag","Kapsid","Plasmid","Ribosom"],a:0,e:"A adalah DNA fag yang menyatu dengan kromosom bakteri, disebut profag."},
+{b:3,d:2,g:"pro",q:"Bagian bertanda B pada gambar adalah…",o:["Kromosom bakteri","Profag","Kapsid fag","Flagela"],a:0,e:"B adalah DNA/kromosom milik bakteri tempat profag menyatu."},
+{b:3,d:2,g:"pro",q:"Bagian bertanda C pada gambar adalah…",o:["Dinding sel bakteri","Kapsid fag","Ribosom","Membran inti"],a:0,e:"C menunjuk dinding sel bakteri. Bakteri tidak memiliki membran inti."},
+{b:3,d:2,g:"pro",q:"Peristiwa yang ditunjukkan gambar pada siklus lisogenik disebut…",o:["Integrasi: DNA fag menyatu dengan kromosom bakteri","Lisis sel bakteri","Adsorpsi","Perakitan fag baru"],a:0,e:"Integrasi menghasilkan profag yang ikut dibawa saat sel bakteri membelah."},
+{b:3,d:3,g:"prodiv",q:"Pada gambar, profag dapat berada di kedua sel anak karena…",o:["DNA fag menyatu dengan kromosom bakteri sehingga ikut direplikasi","Fag menyerang sel anak pada tiap pembelahan","Kapsid fag ikut membelah","Bakteri membuat antibodi"],a:0,e:"Profag direplikasi bersama kromosom bakteri dan diwariskan ke sel anak."},
+{b:3,d:3,g:"prodiv",q:"Jika bakteri pada gambar terkena sinar UV, profag dapat keluar dari kromosom dan siklus berubah menjadi…",o:["Litik","Fotosintesis","Konjugasi","Transformasi"],a:0,e:"Induksi oleh UV atau zat kimia mengaktifkan profag sehingga virus masuk ke siklus litik."},
+{b:3,d:2,g:"cyc",q:"Pada gambar, jalur A menunjukkan DNA fag…",o:["Menyatu dengan kromosom bakteri","Langsung membuat protein fag","Dihancurkan bakteri","Berubah menjadi RNA"],a:0,e:"Jalur A adalah siklus lisogenik: DNA fag terintegrasi menjadi profag."},
+{b:3,d:2,g:"cyc",q:"Pada gambar, jalur B berakhir dengan sel bakteri yang…",o:["Pecah (lisis)","Tetap hidup dan membelah","Menjadi spora","Berubah menjadi virus"],a:0,e:"Jalur B adalah siklus litik yang berakhir dengan lisis sel."},
+{b:3,d:3,g:"cyc",q:"Tahap yang sama pada kedua jalur sebelum percabangan pada gambar adalah…",o:["Adsorpsi dan penetrasi","Sintesis dan perakitan","Perakitan dan lisis","Lisis dan integrasi"],a:0,e:"Siklus litik dan lisogenik sama-sama diawali adsorpsi dan penetrasi, lalu berbeda nasib DNA fag."},
+/* siklus litik & lisogenik (teks) */
+{b:3,d:2,q:"Pada tahap penetrasi, yang terjadi adalah…",o:["Penyuntikan DNA fag ke dalam sel bakteri","Pecahnya sel bakteri","Penempelan ekor ke reseptor","Pembuatan kapsid"],a:0,e:"Ekor fag menyuntikkan DNA ke dalam sel inang, sedangkan kapsid tertinggal di luar."},
+{b:3,d:2,q:"Tahap perakitan (assembly) pada siklus litik adalah…",o:["Penyatuan DNA fag dan komponen protein menjadi fag utuh","Penyuntikan DNA fag","Penempelan fag pada bakteri","Pemecahan sel inang"],a:0,e:"Pada perakitan, DNA dimasukkan ke kepala fag dan ekor dipasang."},
+{b:3,d:1,q:"Hasil akhir siklus litik adalah…",o:["Sel inang pecah dan banyak virus baru keluar","Sel inang membelah menjadi dua","Virus berubah menjadi profag","Sel inang bertambah besar"],a:0,e:"Siklus litik berakhir dengan lisis dan keluarnya virus-virus baru."},
+{b:3,d:1,q:"DNA fag yang menyatu dengan kromosom bakteri pada siklus lisogenik disebut…",o:["Profag","Kapsomer","Plasmid","Kapsid"],a:0,e:"Profag adalah DNA virus yang terintegrasi pada kromosom inang."},
+{b:3,d:2,q:"Pada siklus lisogenik, setiap kali bakteri membelah, DNA fag…",o:["Ikut direplikasi dan diwariskan ke sel anak","Hilang","Berubah menjadi RNA","Menghancurkan sel anak"],a:0,e:"Profag bagian dari kromosom, sehingga ikut diperbanyak."},
+{b:3,d:3,q:"Siklus lisogenik dapat berubah menjadi siklus litik apabila…",o:["Ada pemicu seperti sinar UV atau zat kimia (induksi)","Bakteri berfotosintesis","Fag kehabisan kapsid","Bakteri diberi vitamin"],a:0,e:"Pemicu mengaktifkan profag sehingga keluar dari kromosom dan masuk siklus litik."},
+{b:3,d:2,q:"Perbedaan utama siklus litik dan lisogenik adalah…",o:["Pada litik sel inang segera lisis, pada lisogenik DNA virus menyatu dengan DNA inang dan sel tidak langsung lisis","Litik hanya terjadi pada tumbuhan","Lisogenik menghasilkan sel baru","Litik tidak memiliki tahap adsorpsi"],a:0,e:"Nasib DNA virus dan sel inang berbeda: litik menghasilkan lisis segera, lisogenik menunda lisis."},
+{b:3,d:3,q:"Tahapan yang sama pada siklus litik dan lisogenik adalah…",o:["Adsorpsi dan penetrasi","Sintesis dan perakitan","Perakitan dan lisis","Lisis dan integrasi"],a:0,e:"Keduanya diawali adsorpsi dan penetrasi, lalu bercabang."},
+{b:3,d:2,q:"Urutan siklus lisogenik yang benar adalah…",o:["Adsorpsi → penetrasi → integrasi (penggabungan DNA) → sel membelah bersama profag","Adsorpsi → lisis → penetrasi → perakitan","Sintesis → adsorpsi → lisis → perakitan","Perakitan → penetrasi → lisis → adsorpsi"],a:0,e:"Pada lisogenik DNA virus terintegrasi dan ikut dibawa saat sel membelah."},
+{b:3,d:2,q:"Perhatikan tahap: 1) lisis 2) adsorpsi 3) perakitan 4) penetrasi 5) sintesis. Urutan siklus litik yang benar adalah…",o:["2-4-5-3-1","2-5-4-3-1","4-2-5-3-1","2-4-3-5-1"],a:0,e:"Adsorpsi (2), penetrasi (4), sintesis (5), perakitan (3), lisis (1)."},
+{b:3,d:2,q:"Penempelan fag pada bakteri bersifat…",o:["Spesifik: hanya pada reseptor yang cocok","Acak pada semua sel","Tanpa reseptor","Hanya pada sel tumbuhan"],a:0,e:"Protein ekor fag hanya cocok dengan reseptor tertentu pada bakteri."},
+/* vaksin dan imunitas */
+{b:3,d:3,q:"Vaksin hidup yang dilemahkan (attenuated) contohnya adalah vaksin…",o:["MR (campak–rubella)","Tetanus toksoid","Hepatitis B rekombinan","Influenza inaktif"],a:0,e:"Vaksin campak/MR berisi virus hidup yang dilemahkan."},
+{b:3,d:1,q:"Imunisasi dasar bagi bayi bertujuan…",o:["Membentuk kekebalan aktif terhadap penyakit tertentu","Mengobati penyakit yang sudah parah","Menggantikan ASI","Membunuh bakteri di usus"],a:0,e:"Imunisasi membentuk kekebalan sebelum terpapar penyakit."},
+{b:3,d:2,q:"Kekebalan yang diperoleh setelah seseorang divaksin disebut kekebalan…",o:["Aktif buatan","Pasif alami","Pasif buatan","Aktif alami"],a:0,e:"Tubuh membentuk antibodi sendiri akibat pemberian vaksin."},
+{b:3,d:3,q:"Pemberian serum antibisa ular memberi kekebalan…",o:["Pasif buatan","Aktif buatan","Aktif alami","Pasif alami"],a:0,e:"Antibodi jadi diberikan dari luar, jadi tubuh tidak membuatnya sendiri."},
+{b:3,d:3,q:"Bayi yang memperoleh antibodi dari ASI (kolostrum) memiliki kekebalan…",o:["Pasif alami","Aktif buatan","Aktif alami","Pasif buatan"],a:0,e:"Antibodi diperoleh secara alami dari ibu."},
+{b:3,d:2,q:"Sel yang mengingat antigen sehingga respons kekebalan kedua lebih cepat disebut…",o:["Sel memori","Eritrosit","Trombosit","Sel lemak"],a:0,e:"Sel memori membuat respons terhadap infeksi berikutnya lebih cepat dan kuat."},
+{b:3,d:3,q:"Vaksin tidak dapat menyembuhkan orang yang sudah sakit parah karena…",o:["Vaksin bekerja mencegah dan butuh waktu untuk membentuk antibodi","Vaksin beracun","Vaksin membunuh sel","Vaksin hanya untuk bayi"],a:0,e:"Vaksin untuk pencegahan, bukan pengobatan."},
+/* penyakit */
+{b:3,d:2,q:"COVID-19 menular terutama melalui…",o:["Percikan (droplet) dan aerosol dari saluran napas","Gigitan nyamuk","Air sumur kotor","Makanan matang yang dimasak"],a:0,e:"SARS-CoV-2 terutama menyebar lewat droplet dan aerosol."},
+{b:3,d:2,q:"Gejala khas DBD adalah…",o:["Demam tinggi mendadak dan bintik perdarahan di kulit","Batuk berdahak lebih dari dua minggu","Kulit menebal dan mati rasa","Diare seperti air cucian beras"],a:0,e:"DBD ditandai demam tinggi, nyeri, dan perdarahan kecil; trombosit dapat menurun."},
+{b:3,d:1,q:"Polio dapat menyebabkan…",o:["Kelumpuhan","Anemia","Diabetes","Rabun"],a:0,e:"Poliovirus menyerang sistem saraf dan dapat menimbulkan kelumpuhan."},
+{b:3,d:3,q:"Gondongan (mumps) menyerang…",o:["Kelenjar ludah (parotis)","Ginjal","Tulang","Kulit"],a:0,e:"Virus mumps menyebabkan pembengkakan kelenjar ludah di pipi."},
+{b:3,d:1,q:"Hepatitis adalah peradangan pada…",o:["Hati","Paru-paru","Jantung","Ginjal"],a:0,e:"Hepatitis berarti peradangan hati (hepar)."},
+{b:3,d:2,q:"HIV TIDAK menular melalui…",o:["Berbagi alat makan atau berpelukan","Transfusi darah tercemar","Jarum suntik bergantian","Ibu ke bayi saat lahir atau menyusui"],a:0,e:"HIV tidak menular lewat kontak sosial biasa."},
+{b:3,d:2,q:"AIDS adalah…",o:["Kumpulan gejala akibat kekebalan tubuh yang sangat menurun setelah infeksi HIV","Nama virusnya","Vaksin untuk HIV","Penyakit akibat bakteri"],a:0,e:"AIDS adalah sindrom, sedangkan HIV adalah virusnya."},
+{b:3,d:1,q:"Cara mencegah penularan HIV adalah…",o:["Tidak berbagi jarum suntik dan setia pada pasangan","Minum antibiotik rutin","Menghindari berjabat tangan","Membasmi nyamuk"],a:0,e:"HIV dicegah dengan menghindari kontak cairan tubuh yang terinfeksi."},
+{b:3,d:2,q:"Flu burung dapat menular ke manusia melalui…",o:["Kontak dengan unggas sakit atau kotorannya","Gigitan nyamuk","Air hujan","Sentuhan antarmanusia sehat"],a:0,e:"Penularan terutama dari unggas terinfeksi ke manusia."},
+{b:3,d:1,q:"Tujuan isolasi atau karantina penderita penyakit menular adalah…",o:["Memutus rantai penularan","Menyembuhkan penyakit seketika","Menambah kekebalan orang lain","Membunuh virus di udara"],a:0,e:"Isolasi mengurangi kontak sehingga penularan terhambat."},
+{b:3,d:1,q:"Fungsi masker dalam mencegah penyakit virus saluran napas adalah…",o:["Menghambat percikan droplet","Membunuh virus","Menambah oksigen","Mengobati infeksi"],a:0,e:"Masker menahan droplet pembawa virus."},
+/* manfaat virus */
+{b:3,d:3,q:"Virus dipakai sebagai pembawa gen (vektor) dalam rekayasa genetika karena…",o:["Mampu memasukkan DNA ke dalam sel inang","Menghasilkan klorofil","Memakan limbah","Mengubah warna sel"],a:0,e:"Virus secara alami efisien memasukkan materi genetik ke sel inang."},
+{b:3,d:3,q:"Contoh biopestisida berbasis virus adalah…",o:["Baculovirus (NPV) untuk mengendalikan ulat hama","HIV untuk mengendalikan tikus","Bakteriofag untuk mengendalikan jamur","TMV untuk mengendalikan nyamuk"],a:0,e:"Baculovirus hanya menginfeksi serangga tertentu sehingga aman bagi manusia."},
+{b:3,d:3,q:"Terapi fag (phage therapy) memanfaatkan bakteriofag untuk…",o:["Membunuh bakteri penyebab infeksi tertentu","Membunuh virus penyebab flu","Menyuburkan tanah","Membuat vitamin"],a:0,e:"Fag spesifik dapat menginfeksi dan melisiskan bakteri patogen, terutama bila bakteri resisten antibiotik."},
+{b:3,d:3,q:"Penyakit virus pada tanaman dapat dikendalikan dengan…",o:["Menanam varietas tahan, memusnahkan tanaman sakit, dan mengendalikan serangga vektor","Menyiram antibiotik","Menambah garam pada tanah","Menanam lebih rapat"],a:0,e:"Pengendalian virus tanaman berfokus pada pencegahan dan pemutusan penularan."}
+];
+const BAB=["","Kenali Virus","Pilah Cepat","Misi Tubuh"];
+const BABD=["","Pilihan ganda tentang ciri, struktur, dan sejarah virus (ada soal bergambar).","Klasifikasi cepat: pilih satu dari dua kategori.","Soal aplikatif: siklus litik dan lisogenik, penyakit, vaksin, dan manfaat."];
+/* ========== GAMBAR ========== */
+const bd=(x,y,l)=>`<circle cx="${x}" cy="${y}" r="10" fill="#ffc857"/><text x="${x}" y="${y+5}" text-anchor="middle" font-size="14" font-weight="800" fill="#10163a">${l}</text>`;
+const pt=(cx,cy,r,a)=>[cx+r*Math.cos(a*Math.PI/180),cy+r*Math.sin(a*Math.PI/180)];
+const ld=(x1,y1,x2,y2)=>`<path d="M${x1} ${y1}L${x2} ${y2}" stroke="#fff" stroke-opacity=".75" stroke-width="1.5" fill="none"/>`;
+const hexp=(cx,cy,r)=>[0,1,2,3,4,5].map(i=>pt(cx,cy,r,i*60+30).map(n=>n.toFixed(1)).join(",")).join(" ");
+const ph=(x,y,k,dna)=>`<g transform="translate(${x} ${y}) scale(${k})"><polygon points="0,-30 14,-22 14,-8 0,0 -14,-8 -14,-22" fill="#3b4b94" stroke="#3fc6b7" stroke-width="3"/>${dna===0?"":`<path d="M-8-18q4-7 8 0t8 0" fill="none" stroke="#ff6b8a" stroke-width="3" stroke-linecap="round"/>`}<rect x="-3" y="0" width="6" height="18" fill="#3fc6b7"/><path d="M0 18L-12 30M0 18L12 30M0 18V32" stroke="#ffc857" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>`;
+const bc=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${h/2}" fill="#6a78c8" fill-opacity=".85" stroke="#a9b3d9" stroke-width="3"/>`;
+const chr=(x,y,w)=>`<path d="M${x} ${y}q${w/8} -14 ${w/4} 0t${w/4} 0t${w/4} 0t${w/4} 0" fill="none" stroke="#ffc857" stroke-width="4" stroke-linecap="round"/>`;
+const hx=(x,y)=>`<polygon points="${x},${y-9} ${x+8},${y-4} ${x+8},${y+4} ${x},${y+9} ${x-8},${y+4} ${x-8},${y-4}" fill="#3b4b94" stroke="#3fc6b7" stroke-width="2"/>`;
+const bx=(x,y,w,h,l1,l2)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" fill="#1a2250" stroke="#3fc6b7" stroke-width="2"/><text x="${x+w/2}" y="${y+(l2?12:h/2+3)}" text-anchor="middle" font-size="9" font-weight="700" fill="#f3efe6">${l1}</text>${l2?`<text x="${x+w/2}" y="${y+23}" text-anchor="middle" font-size="9" font-weight="700" fill="#f3efe6">${l2}</text>`:""}`;
+const arr=(d)=>`<path d="${d}" stroke="#ffc857" stroke-width="2" fill="none" marker-end="url(#ar)"/>`;
+const SV={
+v:`<svg viewBox="0 0 220 150"><g stroke="#ffc857" stroke-width="4" stroke-linecap="round"><path d="M110 33v-17M152 48l12-12M68 48L56 36M168 86h16M52 86H36M152 124l12 12M68 124l-12 12"/></g><circle cx="110" cy="86" r="52" fill="#3b4b94" stroke="#3fc6b7" stroke-width="7"/><path d="M78 86q16-34 32 0t32 0" fill="none" stroke="#ff6b8a" stroke-width="6" stroke-linecap="round"/>${bd(136,18,"C")}${bd(172,124,"A")}${bd(110,112,"B")}</svg>`,
+f:`<svg viewBox="0 0 220 150"><polygon points="110,8 142,24 142,52 110,68 78,52 78,24" fill="#3b4b94" stroke="#3fc6b7" stroke-width="5"/><path d="M92 38h36" stroke="#ff6b8a" stroke-width="5" stroke-linecap="round"/><rect x="104" y="68" width="12" height="46" fill="#3fc6b7"/><path d="M110 114L76 138M110 114L144 138M110 114v26" stroke="#ffc857" stroke-width="4" stroke-linecap="round" fill="none"/>${bd(160,38,"A")}${bd(136,90,"B")}${bd(168,132,"C")}</svg>`,
+s:`<svg viewBox="0 0 220 150"><circle cx="34" cy="70" r="7" fill="#ff6b8a"/><rect x="72" y="52" width="70" height="36" rx="18" fill="#3fc6b7"/><circle cx="180" cy="70" r="30" fill="#6a78c8"/><circle cx="180" cy="70" r="10" fill="#ffc857"/>${bd(34,112,"A")}${bd(107,112,"B")}${bd(180,122,"C")}</svg>`,
+logo:`<svg viewBox="0 0 200 200"><g stroke="#ffc857" stroke-width="9" stroke-linecap="round"><path d="M100 36V10M146 54l18-18M54 54L36 36M164 100h26M10 100h26M146 146l18 18M54 146l-18 18M100 164v26"/></g><circle cx="100" cy="100" r="62" fill="#ff6b8a"/><circle cx="100" cy="100" r="62" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="6" stroke-dasharray="4 14"/><circle cx="80" cy="84" r="9" fill="#10163a"/><circle cx="120" cy="84" r="9" fill="#10163a"/><path d="M78 118q22 18 44 0" fill="none" stroke="#10163a" stroke-width="7" stroke-linecap="round"/></svg>`,
+/* virus berselubung */
+e:(()=>{let s="";for(let i=0;i<12;i++){const p=pt(110,80,50,i*30),q=pt(110,80,63,i*30);s+=`<path d="M${p[0]} ${p[1]}L${q[0]} ${q[1]}" stroke="#ffc857" stroke-width="4" stroke-linecap="round"/><circle cx="${q[0]}" cy="${q[1]}" r="3.5" fill="#ffc857"/>`}
+const a=pt(110,80,63,-30),b=pt(110,80,50,-135),c=pt(110,80,30,135);
+return `<svg viewBox="0 0 220 150"><circle cx="110" cy="80" r="50" fill="#6a78c8" fill-opacity=".4" stroke="#a9b3d9" stroke-width="4"/>${s}<circle cx="110" cy="80" r="30" fill="#3b4b94" stroke="#3fc6b7" stroke-width="5"/><path d="M92 80q9-16 18 0t18 0" fill="none" stroke="#ff6b8a" stroke-width="4" stroke-linecap="round"/>${ld(a[0],a[1],190,24)}${ld(b[0],b[1],28,30)}${ld(c[0],c[1],28,128)}${ld(128,80,194,128)}${bd(192,22,"A")}${bd(28,28,"B")}${bd(28,128,"C")}${bd(194,128,"D")}</svg>`})(),
+/* virus batang (TMV) */
+t:(()=>{let s="";for(let x=40;x<178;x+=12)s+=`<path d="M${x} 50l8 40" stroke="#3fc6b7" stroke-opacity=".6" stroke-width="2"/>`;
+return `<svg viewBox="0 0 220 150"><rect x="30" y="50" width="160" height="40" rx="6" fill="#3b4b94" stroke="#3fc6b7" stroke-width="3"/>${s}<path d="M34 70H186" stroke="#ff6b8a" stroke-width="4" stroke-linecap="round"/>${ld(60,50,40,24)}${ld(150,70,170,120)}${bd(40,22,"A")}${bd(170,122,"B")}</svg>`})(),
+/* virus polihedral */
+p:(()=>{let s="";for(let i=0;i<6;i++){const a=pt(110,80,44,i*60+30),b=pt(110,80,60,i*60+30);s+=`<path d="M${a[0]} ${a[1]}L${b[0]} ${b[1]}" stroke="#ffc857" stroke-width="3" stroke-linecap="round"/><circle cx="${b[0]}" cy="${b[1]}" r="4" fill="#ffc857"/>`}
+return `<svg viewBox="0 0 220 150">${s}<polygon points="${hexp(110,80,44)}" fill="#3b4b94" stroke="#3fc6b7" stroke-width="5"/><path d="M110 36V124M72 58L148 102M148 58L72 102" stroke="#3fc6b7" stroke-opacity=".5" stroke-width="2"/><path d="M92 80q9-14 18 0t18 0" fill="none" stroke="#ff6b8a" stroke-width="4" stroke-linecap="round"/></svg>`})(),
+/* empat bentuk virus */
+sh:(()=>{let sp="";for(let i=0;i<8;i++){const a=pt(165,110,18,i*45),b=pt(165,110,26,i*45);sp+=`<path d="M${a[0]} ${a[1]}L${b[0]} ${b[1]}" stroke="#ffc857" stroke-width="3" stroke-linecap="round"/>`}
+return `<svg viewBox="0 0 220 150"><path d="M110 8V142M6 75H214" stroke="#fff" stroke-opacity=".12"/><rect x="22" y="28" width="66" height="20" rx="4" fill="#3b4b94" stroke="#3fc6b7" stroke-width="3"/><path d="M34 28l5 20M46 28l5 20M58 28l5 20M70 28l5 20" stroke="#3fc6b7" stroke-opacity=".6" stroke-width="2"/><polygon points="${hexp(165,38,22)}" fill="#3b4b94" stroke="#3fc6b7" stroke-width="3"/>${ph(55,94,.8)}${sp}<circle cx="165" cy="110" r="18" fill="#6a78c8" stroke="#a9b3d9" stroke-width="3"/>${bd(14,14,"A")}${bd(124,14,"B")}${bd(14,76,"C")}${bd(124,76,"D")}</svg>`})(),
+/* tahapan siklus litik */
+lit1:`<svg viewBox="0 0 220 150">${bc(30,88,160,50)}${ph(110,56,1)}${chr(62,116,96)}</svg>`,
+lit2:`<svg viewBox="0 0 220 150">${bc(30,88,160,50)}${ph(110,56,1,0)}<path d="M110 38V104q-6 10-22 8" fill="none" stroke="#ff6b8a" stroke-width="3" stroke-linecap="round"/>${chr(76,126,90)}</svg>`,
+lit3:`<svg viewBox="0 0 220 150">${bc(24,30,172,92)}<path d="M46 76h16M70 98h12" stroke="#ffc857" stroke-width="4" stroke-linecap="round"/>${[[52,52],[104,48],[150,58],[74,104],[128,102],[168,90]].map(p=>`<path d="M${p[0]} ${p[1]}q4-8 8 0t8 0" fill="none" stroke="#ff6b8a" stroke-width="3" stroke-linecap="round"/>`).join("")}${[[92,70],[140,80],[110,86]].map(p=>hx(p[0],p[1])).join("")}</svg>`,
+lit4:`<svg viewBox="0 0 220 150">${bc(24,30,172,92)}${[[62,60],[108,58],[154,60],[84,98],[132,98]].map(p=>ph(p[0],p[1],.5)).join("")}</svg>`,
+lit5:`<svg viewBox="0 0 220 150"><ellipse cx="110" cy="78" rx="64" ry="34" fill="#6a78c8" fill-opacity=".25" stroke="#a9b3d9" stroke-width="3" stroke-dasharray="7 9"/>${[[26,30],[84,26],[142,24],[196,40],[24,118],[196,116],[110,126]].map(p=>ph(p[0],p[1],.5)).join("")}</svg>`,
+/* siklus lisogenik */
+pro:(()=>{const a=pt(110,76,26,10),b=pt(110,76,26,200);
+return `<svg viewBox="0 0 220 150">${bc(24,30,172,92)}<circle cx="110" cy="76" r="26" fill="none" stroke="#ffc857" stroke-width="7"/><circle cx="110" cy="76" r="26" fill="none" stroke="#ff6b8a" stroke-width="7" stroke-dasharray="36 128" transform="rotate(-30 110 76)"/>${ld(a[0],a[1],172,78)}${ld(b[0],b[1],48,60)}${bd(172,78,"A")}${bd(48,60,"B")}${bd(110,30,"C")}</svg>`})(),
+prodiv:`<svg viewBox="0 0 220 150">${bc(12,38,94,74)}${bc(114,38,94,74)}${[59,161].map(cx=>`<circle cx="${cx}" cy="75" r="17" fill="none" stroke="#ffc857" stroke-width="5"/><circle cx="${cx}" cy="75" r="17" fill="none" stroke="#ff6b8a" stroke-width="5" stroke-dasharray="24 83" transform="rotate(-30 ${cx} 75)"/>`).join("")}<text x="59" y="132" text-anchor="middle" font-size="11" fill="#a9b3d9">sel anak 1</text><text x="161" y="132" text-anchor="middle" font-size="11" fill="#a9b3d9">sel anak 2</text></svg>`,
+/* percabangan dua jalur */
+cyc:`<svg viewBox="0 0 220 150"><defs><marker id="ar" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6z" fill="#ffc857"/></marker></defs>${bx(45,4,130,22,"Adsorpsi + penetrasi")}${arr("M90 26L56 48")}${arr("M130 26L164 48")}${bx(6,50,100,28,"DNA fag menyatu","dengan kromosom")}${bx(114,50,100,28,"Sintesis +","perakitan fag baru")}${arr("M56 78V98")}${arr("M164 78V98")}${bx(6,100,100,28,"Sel membelah,","profag diwariskan")}${bx(114,100,100,28,"Sel inang pecah,","fag baru keluar")}${bd(12,46,"A")}${bd(208,46,"B")}</svg>`
+};
+/* ========== UTIL: acak, penyimpanan ========== */
+const $=s=>document.querySelector(s),app=$("#app");
+const sh=a=>{a=[...a];for(let i=a.length;i>1;){const j=Math.random()*i--|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const best=()=>{try{return +localStorage.getItem("viro_best")||0}catch(e){return 0}};
+const saveBest=v=>{try{localStorage.setItem("viro_best",v)}catch(e){}};
+/* ========== SUARA (HTML Audio + WebAudio cadangan; berfungsi di Android dan iPhone) ========== */
+let mute=false,ac,ul=false;
+const NOTES={ok:[[523,0,.16],[659,.1,.16],[784,.2,.16],[1047,.3,.32]],no:[[196,0,.22,"w"],[147,.18,.4,"w"]],win:[[523,0,.14],[659,.12,.14],[784,.24,.14],[1047,.36,.14],[784,.48,.14],[1047,.6,.5]],tap:[[880,0,.05]]};
+function wav(notes){
+  const sr=22050,tot=Math.max(...notes.map(n=>n[1]+n[2]))+.05,N=Math.ceil(sr*tot),d=new Float32Array(N);
+  notes.forEach(n=>{const f=n[0],s=n[1]*sr|0,L=n[2]*sr|0;for(let i=0;i<L&&s+i<N;i++){const v=n[3]=="w"?((f*i/sr)%1)*2-1:Math.sin(2*Math.PI*f*i/sr);d[s+i]+=v*Math.min(1,i/200)*Math.pow(1-i/L,1.5)*.6}});
+  const b=new ArrayBuffer(44+N*2),v=new DataView(b),ws=(o,t)=>{for(let i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i))};
+  ws(0,"RIFF");v.setUint32(4,36+N*2,true);ws(8,"WAVE");ws(12,"fmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);ws(36,"data");v.setUint32(40,N*2,true);
+  for(let i=0;i<N;i++)v.setInt16(44+i*2,Math.max(-1,Math.min(1,d[i]))*32767,true);
+  return URL.createObjectURL(new Blob([b],{type:"audio/wav"}));
+}
+const SND={};try{for(const k in NOTES)SND[k]=wav(NOTES[k])}catch(e){}
+const A=new Audio();A.preload="auto";
+function wa(k){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state=="suspended")ac.resume();NOTES[k].forEach(n=>{const s=ac.currentTime+n[1],o=ac.createOscillator(),g=ac.createGain();o.type=n[3]=="w"?"sawtooth":"sine";o.frequency.value=n[0];g.gain.setValueAtTime(.5,s);g.gain.exponentialRampToValueAtTime(.001,s+n[2]);o.connect(g);g.connect(ac.destination);o.start(s);o.stop(s+n[2])})}catch(e){}}
+function snd(k){if(mute)return;try{A.pause();A.src=SND[k];A.volume=1;const p=A.play();if(p&&p.catch)p.catch(()=>wa(k))}catch(e){wa(k)}}
+function unlock(){
+  if(ul)return;ul=true;
+  try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
+  try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state=="suspended")ac.resume()}catch(e){}
+  try{A.src=SND.tap;A.volume=1;const p=A.play();if(p&&p.catch)p.catch(()=>{ul=false})}catch(e){ul=false}
+}
+["pointerdown","touchend","click","keydown"].forEach(e=>addEventListener(e,unlock,{passive:true}));
+const sfx=ok=>snd(ok?"ok":"no");
+/* ========== STATE ========== */
+let S,PER=10;
+const perUI=(g)=>`<p class="hint">Jumlah soal per babak${g?" (dibagi rata ke semua kelompok)":""}</p><div class="row seg">${[6,10,15].map(k=>`<button type="button" class="btn gh ${k==PER?"on":""}" data-p="${k}">${k}</button>`).join("")}</div>`;
+const perBind=()=>document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{PER=+b.dataset.p;document.querySelectorAll("[data-p]").forEach(x=>x.classList.toggle("on",x===b))});
+function home(){
+  S=null;
+  app.innerHTML=`<section class="hero slide"><div class="lens">${SV.logo}</div><h1>Viro-Lab</h1><h2>Misi Pemburu Virus</h2>
+  <p>Ulangan materi Virus dalam 3 babak. Jawab cepat dan beruntun untuk bonus skor. ${best()?`Rekor solo di perangkat ini: <b>${best()}</b>.`:""}</p>
+  <div class="row"><button class="btn" id="solo">Main solo</button><button class="btn alt" id="grp">Main berkelompok</button></div>
+  <div class="row"><button class="btn gh" id="mu">${mute?"🔇 Suara mati":"🔊 Suara menyala"}</button><button class="btn gh" id="ts">▶ Tes suara</button></div>
+  <p class="hint">Jika suara belum terdengar: naikkan volume media dan matikan mode senyap (iPhone), lalu tekan «Tes suara».</p>
+  <p style="font-size:.9rem;color:var(--mut)">Disusun oleh Bilkis Nur Izzaty, S.Pd. · Guru Biologi · SMA Negeri 2 Kalianda</p></section>`;
+  $("#solo").onclick=ident;$("#grp").onclick=()=>setup();
+  $("#mu").onclick=()=>{mute=!mute;home()};
+  $("#ts").onclick=()=>{unlock();const m=mute;mute=false;snd("ok");mute=m};
+}
+const cl=x=>x.replace(/[<>&"]/g,"").trim();
+function ident(){
+  app.innerHTML=`<section class="slide hero"><h2>Isi identitasmu dulu</h2><p>Data ini dipakai untuk skor dan sertifikatmu.</p>
+  <div class="row"><input id="nm" type="text" placeholder="Nama lengkap" style="width:min(380px,90%)"></div>
+  <div class="row"><input id="kl" type="text" placeholder="Kelas (mis. X-3)"><input id="ab" type="text" inputmode="numeric" placeholder="No. absen" style="width:130px"></div>
+  ${perUI(false)}
+  <p id="er" style="color:var(--no);min-height:1.5em"></p><div class="row"><button class="btn" id="go">Mulai</button><button class="btn gh" id="bk">Kembali</button></div></section>`;
+  perBind();
+  $("#bk").onclick=home;$("#go").onclick=()=>{const nm=cl($("#nm").value),kelas=cl($("#kl").value),absen=cl($("#ab").value);if(!nm||!kelas||!absen){$("#er").textContent="Nama, kelas, dan nomor absen wajib diisi.";return}start([nm],{kelas,absen})};
+}
+function setup(n=3){
+  const v=id=>cl((($("#"+id)||{}).value)||""),kl=v("kl"),names=[...Array(n)].map((_,i)=>v("n"+i)||"Kelompok "+(i+1)),ang=[...Array(n)].map((_,i)=>v("a"+i));
+  app.innerHTML=`<section class="slide hero"><h2>Mode kelompok (satu layar)</h2>
+  <p>Setiap kelompok mendapat soal yang <b>berbeda</b> dengan tingkat kesulitan seimbang, jadi kelompok yang tampil belakangan tidak bisa menyontek.</p>
+  <div class="row seg">${[2,3,4,5].map(k=>`<button class="btn gh ${k==n?"on":""}" data-k="${k}">${k} kelompok</button>`).join("")}</div>
+  <div class="row"><input type="text" id="kl" placeholder="Kelas (mis. X-3)" value="${kl}"></div>
+  ${names.map((x,i)=>`<div class="row"><input type="text" id="n${i}" value="${x}" aria-label="Nama kelompok ${i+1}"><input type="text" id="a${i}" placeholder="Anggota (pisahkan dengan koma)" value="${ang[i]}" style="width:min(400px,90%)"></div>`).join("")}
+  ${perUI(true)}
+  <div class="row"><button class="btn" id="go">Mulai</button><button class="btn gh" id="bk">Kembali</button></div></section>`;
+  perBind();
+  document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>setup(+b.dataset.k));
+  $("#bk").onclick=home;$("#go").onclick=()=>{const kelas=v("kl");if(!kelas)return $("#kl").focus();start([...Array(n)].map((_,i)=>v("n"+i)||"Kelompok "+(i+1)),{kelas,anggota:[...Array(n)].map((_,i)=>v("a"+i))})};
+}
+function review(){
+  app.innerHTML=`<section class="slide"><h2>Pembahasan</h2>${S.rev.map(r=>`<div class="fb ${r.ok?"ok":"no"}" style="margin:10px 0"><b>${S.solo?"":S.names[r.t]+" · "}Babak ${r.b}</b>: ${r.q}<br>Jawabanmu: ${r.ch} ${r.ok?"✔":"✘"}${r.ok?"":`<br>Jawaban benar: <b>${r.ca}</b>`}<br><i>${r.e}</i></div>`).join("")}<div class="row"><button class="btn" id="bk">Kembali ke hasil</button></div></section>`;
+  $("#bk").onclick=result;
+}
+function cert(i){
+  const sc=S.sc[i],lg=S.log[i],c=lg.reduce((a,l)=>a+l.c,0),n=lg.reduce((a,l)=>a+l.n,0),nilai=n?Math.round(c/n*100):0,
+  pred=nilai>=85?"Sangat Baik":nilai>=75?"Baik":nilai>=60?"Cukup":"Perlu Bimbingan",nm=S.names[i];
+  app.innerHTML=`<section class="slide hero"><h2>Sertifikat</h2>${S.solo?"":`<div class="row seg">${S.names.map((x,k)=>`<button class="btn gh ${k==i?"on":""}" data-i="${k}">${x}</button>`).join("")}</div>`}<canvas id="cv" width="1400" height="990" style="width:100%;border-radius:12px;background:#fff"></canvas>
+  <div class="row"><button class="btn" id="dl">Unduh gambar (PNG)</button><button class="btn alt" id="pr">Cetak</button><button class="btn gh" id="bk">Kembali ke hasil</button></div></section>`;
+  document.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>cert(+b.dataset.i));
+  const g=$("#cv").getContext("2d"),W=1400,H=990,F='Georgia,"Times New Roman",serif',NAVY="#141b3a",GOLD="#b8902a";
+  const tx=(t,y,z,col,w,x,st)=>{g.fillStyle=col;g.font=`${st||""}${w||400} ${z}px ${F}`;g.textAlign="center";g.fillText(t,x||W/2,y)};
+  const fit=(t,mx,z,w,st)=>{while(z>16){g.font=`${st||""}${w} ${z}px ${F}`;if(g.measureText(t).width<=mx)break;z-=2}return z};
+  g.fillStyle="#fffdf7";g.fillRect(0,0,W,H);
+  g.strokeStyle=NAVY;g.lineWidth=16;g.strokeRect(28,28,W-56,H-56);
+  g.strokeStyle=GOLD;g.lineWidth=5;g.strokeRect(52,52,W-104,H-104);
+  g.strokeStyle=NAVY;g.lineWidth=2;g.strokeRect(66,66,W-132,H-132);
+  g.fillStyle=GOLD;[[52,52],[W-52,52],[52,H-52],[W-52,H-52]].forEach(q=>{g.save();g.translate(q[0],q[1]);g.rotate(Math.PI/4);g.fillRect(-12,-12,24,24);g.restore()});
+  tx("SMA NEGERI 2 KALIANDA",150,44,NAVY,700);
+  tx("Mata Pelajaran Biologi · Kelas X",192,26,"#555",400,0,"italic ");
+  g.fillStyle=GOLD;g.fillRect(450,214,500,4);
+  try{g.letterSpacing="10px"}catch(e){}
+  tx("SERTIFIKAT",318,104,NAVY,700);
+  try{g.letterSpacing="3px"}catch(e){}
+  tx("HASIL ASESMEN SUMATIF",374,36,"#1d3a7a",700);
+  try{g.letterSpacing="0px"}catch(e){}
+  tx("Diberikan kepada",436,30,"#555",400,0,"italic ");
+  const zn=fit(nm,1000,80,700);tx(nm,524,zn,"#8b1a3a",700);g.fillStyle=GOLD;g.fillRect(300,546,800,4);
+  const idt=S.solo?`Kelas ${S.meta.kelas} · No. Absen ${S.meta.absen}`:`Kelas ${S.meta.kelas}`+(S.meta.anggota&&S.meta.anggota[i]?` · Anggota: ${S.meta.anggota[i]}`:"");
+  tx(idt,596,fit(idt,1100,30,400),"#333",400);
+  tx("telah mengikuti Asesmen Sumatif Biologi materi Virus dengan hasil sebagai berikut:",650,28,"#444",400);
+  tx(`Nilai: ${nilai}`,725,70,NAVY,700);
+  tx(`${c} dari ${n} soal dijawab benar  ·  Skor ${sc} poin  ·  Predikat: ${pred}`,775,28,"#1d3a7a",700);
+  tx("Kalianda, "+new Date().toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"}),830,28,"#333",400,1030);
+  tx("Guru Biologi,",866,28,"#333",400,1030);
+  g.fillStyle=NAVY;g.fillRect(860,916,340,3);tx("Bilkis Nur Izzaty, S.Pd.",910,30,NAVY,700,1030);
+  $("#dl").onclick=()=>{const a=document.createElement("a");a.download="Sertifikat-Asesmen-Sumatif-"+nm+".png";a.href=$("#cv").toDataURL("image/png");a.click()};
+  $("#pr").onclick=()=>window.print();$("#bk").onclick=result;
+}
+/* ========== PENYUSUNAN GILIRAN ========== */
+function start(names,meta){
+  const T=names.length,solo=T==1,turns=[],per=solo?PER:Math.max(1,Math.floor(PER/T));
+  for(let b=1;b<=3;b++){
+    const pool=sh(Q.filter(q=>q.b==b));
+    if(solo){turns.push({t:0,b,qs:pool.slice(0,per)});continue}
+    const pick=pool.slice(0,T*per).sort((x,y)=>x.d-y.d);
+    const h=[...Array(T)].map(()=>[]);
+    pick.forEach((q,i)=>{const r=i/T|0,p=i%T;h[r%2?T-1-p:p].push(q)});
+    for(let k=0;k<T;k++){const t=(k+b-1)%T;turns.push({t,b,qs:sh(h[t])})}
+  }
+  S={meta:meta||{},rev:[],names,T,solo,per,turns,ti:0,qi:0,sc:names.map(()=>0),st:names.map(()=>0),log:names.map(()=>[0,0,0,0].map(()=>({c:0,n:0}))),res:[]};
+  intro();
+}
+function intro(){
+  const tn=S.turns[S.ti];
+  app.innerHTML=`<section class="slide cover"><div class="chip">Babak ${tn.b} dari 3</div><h2 class="big" style="margin:10px 0">${BAB[tn.b]}</h2><p>${BABD[tn.b]}</p>
+  ${S.solo?"":`<p class="big" style="font-size:1.8rem;color:var(--pink)">Giliran: ${S.names[tn.t]}</p><p>Layar diserahkan ke ${S.names[tn.t]}. Kelompok lain: <b>buang muka dulu</b> supaya soal tidak terlihat.</p>`}
+  <button class="btn" id="go">${S.solo?"Mulai babak":"Kami siap, tampilkan soal"}</button></section>`;
+  S.qi=0;$("#go").onclick=ask;
+}
+/* ========== SOAL ========== */
+let tmr;
+function ask(){
+  const tn=S.turns[S.ti],q=tn.qs[S.qi],t=tn.t;
+  S.ord=sh(q.o.map((_,i)=>i));S.done=false;S.t0=Date.now();S.tl=[0,90,50,90][tn.b]+(q.g?20:0);
+  app.innerHTML=`<div class="top"><span class="chip">Babak ${tn.b}: ${BAB[tn.b]}</span>${S.solo?"":`<span class="chip">${S.names[t]}</span>`}<span class="score" id="sc">${S.sc[t]}</span></div>
+  <section class="slide"><div class="dots">${tn.qs.map((_,i)=>`<i class="${i==S.qi?"cur":(S.res[S.ti]||[])[i]||""}"></i>`).join("")}</div>
+  <div class="tm"><b id="tb"></b></div><p class="q">${q.q}</p>${q.g?`<div class="fig">${SV[q.g]}</div>`:""}
+  <div class="opts ${q.o.length==2?"two":""}">${S.ord.map((oi,k)=>`<button class="opt" data-k="${k}"><span>${"ABCD"[k]}</span>${q.o[oi]}</button>`).join("")}</div><div id="fb"></div></section>`;
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(+b.dataset.k));
+  clearInterval(tmr);tmr=setInterval(()=>{const r=Math.max(0,S.tl-(Date.now()-S.t0)/1000);$("#tb").style.width=r/S.tl*100+"%";if(r<=0)answer(-1)},100);
+}
+function answer(k){
+  if(S.done)return;S.done=true;clearInterval(tmr);
+  const tn=S.turns[S.ti],q=tn.qs[S.qi],t=tn.t,left=Math.max(0,S.tl-(Date.now()-S.t0)/1000);
+  const ok=k>=0&&S.ord[k]==q.a;let pts=0;
+  if(ok){S.st[t]++;pts=100+Math.round(30*left/S.tl)+Math.min(S.st[t]-1,3)*10}else S.st[t]=0;
+  S.sc[t]+=pts;S.rev.push({t,b:tn.b,q:q.q,ch:k<0?"(tidak menjawab)":q.o[S.ord[k]],ca:q.o[q.a],ok,e:q.e});S.log[t][tn.b].n++;if(ok)S.log[t][tn.b].c++;
+  (S.res[S.ti]=S.res[S.ti]||[])[S.qi]=ok?"ok":"no";sfx(ok);
+  document.querySelectorAll(".opt").forEach((b,i)=>{b.disabled=true;if(i==k)b.classList.add(ok?"ok":"no")});
+  const last=S.qi==tn.qs.length-1;
+  $("#sc").textContent=S.sc[t];
+  $("#fb").innerHTML=`<div class="fb ${ok?"ok":"no"}"><b>${k<0?"Waktu habis!":ok?"Benar! +"+pts:"Belum tepat"}</b>${ok&&S.st[t]>1?` · 🔥 Beruntun ${S.st[t]}×`:""}<br>Pembahasan dibuka setelah semua soal selesai.</div><div class="row"><button class="btn" id="nx">${last?(S.ti==S.turns.length-1?"Lihat hasil":"Selesai giliran"):"Soal berikutnya"}</button></div>`;
+  $("#nx").focus();$("#nx").onclick=()=>{S.qi++;if(S.qi<tn.qs.length)return ask();S.ti++;S.ti>=S.turns.length?result():intro()};
+}
+/* ========== HASIL ========== */
+function result(){
+  const max=S.per*3*160;
+  let h="";
+  if(S.solo){
+    const sc=S.sc[0],p=sc/max,stars=p>.66?3:p>.4?2:1,nb=!S.fin&&sc>best();if(nb){saveBest(sc);S.nb=1}
+    h=`<div class="stars">${"★".repeat(stars)}<span style="opacity:.25">${"★".repeat(3-stars)}</span></div><p class="big" style="text-align:center;font-size:2.4rem;color:var(--amb)">${sc} poin</p>
+    <p style="text-align:center">${S.nb?"Rekor baru di perangkat ini!":"Rekor: "+best()}</p>
+    ${[1,2,3].map(b=>{const l=S.log[0][b];return `<div class="bar"><em>${BAB[b]}</em><div><b style="width:0" data-w="${l.c/l.n*100}"></b></div><u>${l.c}/${l.n}</u></div>`}).join("")}`;
+  }else{
+    const r=S.names.map((n,i)=>({n,s:S.sc[i],c:S.log[i].reduce((a,l)=>a+l.c,0),q:S.log[i].reduce((a,l)=>a+l.n,0)})).sort((a,b)=>b.s-a.s);
+    h=`<p class="big" style="text-align:center;font-size:2rem">🏆 ${r[0].n} juara!</p>${r.map((x,i)=>`<div class="bar"><em>${i+1}. ${x.n}</em><div><b style="width:0" data-w="${x.s/Math.max(r[0].s,1)*100}"></b></div><u>${x.s}</u></div><div style="margin:-4px 0 8px 130px;color:var(--mut);font-size:.9rem">${x.c} dari ${x.q} soal benar</div>`).join("")}`;
+  }
+  app.innerHTML=`<section class="slide"><h2 style="text-align:center;margin-bottom:10px">Misi selesai</h2>${h}<div class="row"><button class="btn alt" id="rv">Pembahasan</button><button class="btn" id="ct">Sertifikat</button><button class="btn gh" id="ag">Main lagi (soal diacak)</button><button class="btn gh" id="hm">Menu utama</button></div></section>`;
+  if(!S.fin)snd("win");S.fin=1;setTimeout(()=>document.querySelectorAll("[data-w]").forEach(e=>e.style.width=e.dataset.w+"%"),80);
+  $("#ag").onclick=()=>start(S.names,S.meta);$("#rv").onclick=review;$("#ct").onclick=()=>cert(0);$("#hm").onclick=home;
+}
+home();
+</script></body></html>
